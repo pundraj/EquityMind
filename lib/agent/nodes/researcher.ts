@@ -5,11 +5,18 @@ import { AgentStateType, ResearchNote } from "../state";
 import { RESEARCHER_SYSTEM_PROMPT, buildResearcherMessage } from "../../prompts/researcher";
 import { companyLookupTool, marketDataTool, sentimentTool, webSearchTool } from "../tools";
 
+interface ResearchTool {
+  name: string;
+  invoke(input: Record<string, unknown>): Promise<unknown>;
+}
+
+const researchTools: ResearchTool[] = [companyLookupTool, marketDataTool, webSearchTool, sentimentTool];
+
 const llm = new ChatGroq({
   model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
   temperature: 0.1,
   apiKey: process.env.GROQ_API_KEY,
-}).bindTools([companyLookupTool, marketDataTool, webSearchTool, sentimentTool]);
+}).bindTools(researchTools);
 
 const noTool = tool(async () => "No tool requested.", {
   name: "no_op",
@@ -39,8 +46,8 @@ export async function researcherNode(state: AgentStateType): Promise<Partial<Age
 
   for (const call of toolCalls) {
     const toolName = call.name;
-    const args = call.args ?? {};
-    const toolInstance = [companyLookupTool, marketDataTool, webSearchTool, sentimentTool].find((item) => item.name === toolName) ?? noTool;
+    const args = (call.args ?? {}) as Record<string, unknown>;
+    const toolInstance = researchTools.find((item) => item.name === toolName) ?? noTool;
     log.push(`🔍 ${toolName}: ${JSON.stringify(args)}`);
     const result = await toolInstance.invoke(args);
     notes.push({
