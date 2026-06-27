@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const ticker = searchParams.get("ticker");
-    const range = searchParams.get("range") ?? "1mo";
+  const startTime = Date.now();
+  const { searchParams } = new URL(req.url);
+  const ticker = searchParams.get("ticker");
+  const range = searchParams.get("range") ?? "1mo";
+  console.log(`[API REQUEST] GET /api/chart - Ticker: ${ticker}, Range: ${range}`);
 
+  try {
     if (!ticker) {
+      console.warn(`[API WARN] GET /api/chart - Missing ticker param`);
       return NextResponse.json({ error: "Ticker parameter is required" }, { status: 400 });
     }
 
@@ -39,6 +42,8 @@ export async function GET(req: NextRequest) {
     const changePercent = previousClose ? (change / previousClose) * 100 : 0;
     const volume = meta.regularMarketVolume ?? 0;
 
+    console.log(`[API SUCCESS] GET /api/chart - Ticker: ${ticker} fetched in ${Date.now() - startTime}ms`);
+
     return NextResponse.json({
       ticker,
       timestamps,
@@ -50,6 +55,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
+    console.error(`[API ERROR] GET /api/chart - Ticker: ${ticker} failed: ${msg}`);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

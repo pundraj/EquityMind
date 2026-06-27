@@ -38,12 +38,12 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const [comparedStocks, setComparedStocks] = useState<ComparedStock[]>([]);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const [showLogs, setShowLogs] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
-    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initialTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
+    const initialTheme = savedTheme || "light";
     setTheme(initialTheme);
     document.documentElement.setAttribute("data-theme", initialTheme);
     if (initialTheme === "light") {
@@ -72,6 +72,7 @@ export default function Home() {
     setVerdict(null);
     setError(null);
     setIsLoading(true);
+    setShowLogs(true);
 
     try {
       const response = await fetch("/api/research", {
@@ -122,6 +123,7 @@ export default function Home() {
             }
             if (event === "verdict" && data.verdict) {
               setVerdict(data.verdict);
+              setShowLogs(false);
             }
             if (event === "error" && data.message) {
               setError(data.message);
@@ -161,7 +163,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-bg-base text-text-primary flex flex-col selection:bg-accent selection:text-bg-base relative overflow-hidden">
       {/* Lightfall background */}
-      <div className={`fixed inset-0 z-0 overflow-hidden pointer-events-none transition-opacity ${theme === 'dark' ? 'opacity-20' : 'opacity-[0.08]'}`}>
+      <div className={`fixed inset-0 z-0 overflow-hidden pointer-events-none transition-opacity ${theme === 'dark' ? 'opacity-10' : 'opacity-[0.04]'}`}>
         <Lightfall
           colors={theme === 'dark' ? ['#A6C8FF', '#5227FF', '#FF9FFC'] : ['#5A8EFF', '#4F1FFF', '#FF66F9']}
           backgroundColor={theme === 'dark' ? '#0A0B0E' : '#E2E5E9'}
@@ -181,14 +183,23 @@ export default function Home() {
         />
       </div>
 
-      {/* Bloomberg Header Bar */}
-      <header className="border-b border-border-default bg-bg-surface px-4 py-3 sm:px-6">
-        <div className="mx-auto max-w-7xl flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      {/* Pill-shaped floating header */}
+      <div className="w-full max-w-7xl mx-auto px-4 pt-4 sm:px-6 z-20 relative">
+        <header className="rounded-full border border-border-default glass-header px-6 py-3 flex items-center justify-between shadow-lg">
           <div className="flex items-center gap-2.5">
             {/* Small Hexagon Logo Mark */}
-            <div className="w-6 h-6 flex items-center justify-center bg-accent-dim text-accent border border-accent/20 rounded font-mono font-black text-sm">
+            <button 
+              onClick={() => {
+                setVerdict(null);
+                setLogs([]);
+                setIsLoading(false);
+                setError(null);
+                setInputValue("");
+              }}
+              className="w-6 h-6 flex items-center justify-center bg-accent-dim text-accent border border-accent/20 rounded font-mono font-black text-sm hover:border-accent hover:bg-accent-dim/45 transition-colors cursor-pointer"
+            >
               ⬡
-            </div>
+            </button>
             <div>
               <h1 className="text-base font-mono font-black tracking-wider text-text-primary uppercase leading-none">
                 EquityMind
@@ -199,9 +210,31 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Center Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-6 text-[10px] font-mono text-text-primary uppercase font-bold">
+            <button 
+              onClick={() => {
+                setVerdict(null);
+                setLogs([]);
+                setIsLoading(false);
+                setError(null);
+                setInputValue("");
+              }}
+              className="hover:text-accent transition-colors cursor-pointer"
+            >
+              Terminal
+            </button>
+            <span className="text-border-default/40">|</span>
+            <span className="text-text-secondary cursor-not-allowed">Intelligence</span>
+            <span className="text-border-default/40">|</span>
+            <span className="text-text-secondary cursor-not-allowed">Documentation</span>
+            <span className="text-border-default/40">|</span>
+            <span className="text-text-secondary cursor-not-allowed">API Docs</span>
+          </nav>
+
           <div className="flex items-center gap-3">
             {comparedStocks.length > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-bold bg-accent-dim text-accent rounded border border-accent/20 animate-pulse">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold bg-accent-dim text-accent rounded-full border border-accent/20 animate-pulse">
                 <Layers size={12} />
                 COMPARING {comparedStocks.length}/4 STOCKS
               </span>
@@ -209,96 +242,198 @@ export default function Home() {
             
             <button
               onClick={toggleTheme}
-              className="p-2 rounded border border-border-default bg-bg-surface hover:border-accent hover:text-accent text-text-secondary transition-colors cursor-pointer flex items-center justify-center"
+              className="w-8 h-8 rounded-full border border-border-default bg-bg-surface hover:border-accent hover:text-accent text-text-secondary transition-colors cursor-pointer flex items-center justify-center"
               aria-label="Toggle Theme"
               title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
             >
-              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
             </button>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
-      {/* Main Grid Layout */}
-      <main className="flex-1 mx-auto max-w-7xl w-full px-4 py-6 sm:px-6 grid gap-6 md:grid-cols-12 items-start">
-        {/* Left Column (Watchlist Sidebar) */}
-        <aside className="md:col-span-4 h-full min-h-[350px] md:min-h-[500px]">
-          <WatchlistPanel onResearch={handleResearch} />
-        </aside>
+      {/* Main Content Layout */}
+      <main className="flex-1 mx-auto max-w-7xl w-full px-4 py-6 sm:px-6 z-10 relative flex flex-col gap-6">
+        {!(isLoading || verdict || logs.length > 0) ? (
+          /* LANDING PAGE LAYOUT */
+          <div className="flex flex-col gap-10 py-10 animate-fade-in w-full">
+            {/* Landing Hero Section */}
+            <section className="text-center space-y-6 max-w-3xl mx-auto py-6">
+              <h2 className="text-3xl sm:text-5xl font-mono font-black tracking-tight text-text-primary uppercase leading-tight">
+                Institutional-Grade <br />
+                <span className="text-accent">
+                  Equity Intelligence
+                </span>
+              </h2>
+              <p className="text-sm sm:text-base font-mono text-text-secondary leading-relaxed max-w-2xl mx-auto">
+                Deep-dive stock analysis guided by Gemma-4. We query market data, crawl web headlines, evaluate sentiment scores, and reason step-by-step to produce clear, evidence-backed equity verdicts.
+              </p>
+              
+              <div className="pt-4 max-w-xl mx-auto">
+                <ResearchInput
+                  value={inputValue}
+                  setValue={setInputValue}
+                  onSubmit={handleResearch}
+                  isLoading={isLoading}
+                />
+              </div>
+            </section>
 
-        {/* Right Column (Search and Content) */}
-        <section className="md:col-span-8 space-y-6">
-          {/* Search Inputs */}
-          <ResearchInput
-            value={inputValue}
-            setValue={setInputValue}
-            onSubmit={handleResearch}
-            isLoading={isLoading}
-          />
-
-          {/* Suggestions Banner (Spelling suggestions) */}
-          {suggestions.length > 0 && (
-            <SuggestionBanner
-              input={inputValue}
-              suggestions={suggestions}
-              onSelect={(ticker) => {
-                setInputValue(ticker);
-                handleResearch(ticker);
-              }}
-            />
-          )}
-
-          {/* Error Banner */}
-          {error && (
-            <div className="panel p-4 border-down/30 bg-down/5 text-down font-mono text-xs">
-              &gt; ERROR: {error}
+            {/* Featured Watchlists Section */}
+            <section className="space-y-4 w-full">
+              <div className="flex items-center justify-between border-b border-border-default/50 pb-2">
+                <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-text-secondary">
+                  &gt;_ FEATURED_MARKET_WATCHLISTS
+                </h3>
+                <span className="text-[10px] font-mono text-text-muted">60s Auto Refresh</span>
+              </div>
+              <WatchlistPanel onResearch={handleResearch} />
+            </section>
+          </div>
+        ) : (
+          /* WORKSPACE MODE LAYOUT */
+          <div className="flex flex-col gap-6 animate-fade-in w-full">
+            {/* Top Workspace Header & Search Bar */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border-default/50 pb-4">
+              <div>
+                <h2 className="text-lg font-mono font-black uppercase text-accent tracking-wider leading-none">
+                  RESEARCH_WORKSPACE
+                </h2>
+                <p className="text-xs font-mono text-text-secondary mt-1">
+                  Analyzing stock dynamics for: <span className="font-bold text-text-primary">{inputValue}</span>
+                </p>
+              </div>
+              <div className="w-full sm:w-96">
+                <ResearchInput
+                  value={inputValue}
+                  setValue={setInputValue}
+                  onSubmit={handleResearch}
+                  isLoading={isLoading}
+                />
+              </div>
             </div>
-          )}
 
-          {/* Live stock chart */}
-          {verdict && verdict.ticker && !isLoading && (
-            <StockChart ticker={verdict.ticker} />
-          )}
-
-          {/* Log trace output */}
-          {(logs.length > 0 || isLoading) && (
-            <AgentTrace logs={logs} isLoading={isLoading} />
-          )}
-
-          {/* Structured Verdict Report */}
-          {verdict && !isLoading && (
-            <VerdictCard
-              verdict={verdict}
-              onResearch={(ticker) => {
-                setInputValue(ticker);
-                handleResearch(ticker);
-              }}
-              comparedStocks={comparedStocks}
-              onToggleCompare={() =>
-                handleToggleCompare({
-                  companyName: verdict.companyName || inputValue,
-                  ticker: verdict.ticker || inputValue,
-                  verdict,
-                })
-              }
-              onRemoveCompare={handleRemoveCompare}
-              onClearCompare={handleClearCompare}
-            />
-          )}
-
-          {/* Standalone Comparison Panel (Renders when comparing multiple stocks) */}
-          {comparedStocks.length >= 2 && !verdict && (
-            <div className="panel p-6 bg-bg-surface border-border-default/60">
-              <ComparisonTable
-                comparedStocks={comparedStocks}
-                onRemove={handleRemoveCompare}
-                onClearAll={handleClearCompare}
-                onResearch={handleResearch}
+            {/* Suggestions Banner (Spelling suggestions) */}
+            {suggestions.length > 0 && (
+              <SuggestionBanner
+                input={inputValue}
+                suggestions={suggestions}
+                onSelect={(ticker) => {
+                  setInputValue(ticker);
+                  handleResearch(ticker);
+                }}
               />
+            )}
+
+            {/* Error Banner */}
+            {error && (
+              <div className="panel p-6 border-down/30 bg-down/5 text-down font-mono text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="space-y-1.5 flex-1">
+                  <p className="font-bold text-sm uppercase tracking-wider">&gt;_ RESEARCH_EXECUTION_FAILED</p>
+                  <p className="text-text-secondary leading-normal">{error}</p>
+                </div>
+                <button
+                  onClick={() => handleResearch(inputValue)}
+                  className="px-4 py-2 bg-accent hover:bg-accent/90 text-white font-bold uppercase rounded transition-colors cursor-pointer select-none self-start sm:self-center"
+                >
+                  Retry Research
+                </button>
+              </div>
+            )}
+
+            {/* Workspace Content Stack */}
+            <div className="flex flex-col gap-6 w-full animate-fade-in">
+              {/* Accordion to toggle logs */}
+              {(logs.length > 0 || isLoading) && (
+                <div className="w-full">
+                  <button
+                    onClick={() => setShowLogs(!showLogs)}
+                    className="w-full flex items-center justify-between px-5 py-3 rounded border border-border-default bg-bg-surface hover:border-accent hover:text-accent font-mono text-xs uppercase transition-colors cursor-pointer select-none"
+                  >
+                    <span className="flex items-center gap-2 font-bold">
+                      <span>{showLogs ? "▼" : "▶"}</span>
+                      <span>Show Agent Execution Trace Logs</span>
+                    </span>
+                    <span className="text-[10px] text-text-secondary bg-bg-elevated px-2 py-0.5 rounded border border-border-default">
+                      {logs.length} Log entries
+                    </span>
+                  </button>
+                  {showLogs && (
+                    <div className="mt-3 animate-fade-in w-full">
+                      <AgentTrace logs={logs} isLoading={isLoading} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Live stock chart */}
+              {verdict && verdict.ticker && !isLoading && (
+                <StockChart ticker={verdict.ticker} />
+              )}
+
+              {/* Structured Verdict Report */}
+              {verdict && !isLoading && (
+                <VerdictCard
+                  verdict={verdict}
+                  onResearch={(ticker) => {
+                    setInputValue(ticker);
+                    handleResearch(ticker);
+                  }}
+                  comparedStocks={comparedStocks}
+                  onToggleCompare={() =>
+                    handleToggleCompare({
+                      companyName: verdict.companyName || inputValue,
+                      ticker: verdict.ticker || inputValue,
+                      verdict,
+                    })
+                  }
+                  onRemoveCompare={handleRemoveCompare}
+                  onClearCompare={handleClearCompare}
+                />
+              )}
+
+              {/* Standalone Comparison Panel */}
+              {comparedStocks.length >= 2 && !verdict && (
+                <div className="panel p-6 bg-bg-surface border-border-default/60">
+                  <ComparisonTable
+                    comparedStocks={comparedStocks}
+                    onRemove={handleRemoveCompare}
+                    onClearAll={handleClearCompare}
+                    onResearch={handleResearch}
+                  />
+                </div>
+              )}
             </div>
-          )}
-        </section>
+          </div>
+        )}
       </main>
+
+      {/* Clean Developer Details Footer */}
+      <footer className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 mt-auto border-t border-border-default/30 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[10px] text-text-muted">
+        <div>
+          <span>© {new Date().getFullYear()} EQUITYMIND. ALL RIGHTS RESERVED.</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span>DEVELOPER DETAILS:</span>
+          <a
+            href="https://github.com/pundraj"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-text-secondary hover:text-accent transition-colors font-bold underline decoration-dotted"
+          >
+            GITHUB.COM/PUNDRAJ
+          </a>
+          <span className="opacity-30">|</span>
+          <a
+            href="https://rajz.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-text-secondary hover:text-accent transition-colors font-bold underline decoration-dotted"
+          >
+            RAJZ.VERCEL.APP
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

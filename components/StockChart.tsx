@@ -201,12 +201,6 @@ export default function StockChart({ ticker }: StockChartProps) {
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={points} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={strokeColor} stopOpacity={0.2} />
-                  <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
-                </linearGradient>
-              </defs>
               <XAxis dataKey="time" type="number" scale="time" domain={["dataMin", "dataMax"]} tickFormatter={formatXAxis} stroke="var(--text-muted)" />
               <YAxis domain={[minPrice, maxPrice]} orientation="right" stroke="var(--text-muted)" />
               <Tooltip content={<CustomTooltip />} />
@@ -215,8 +209,8 @@ export default function StockChart({ ticker }: StockChartProps) {
                 dataKey="price"
                 stroke={strokeColor}
                 strokeWidth={1.5}
-                fillOpacity={1}
-                fill={`url(#${gradientId})`}
+                fillOpacity={0.06}
+                fill={strokeColor}
                 isAnimationActive={true}
               />
             </AreaChart>

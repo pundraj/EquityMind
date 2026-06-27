@@ -42,5 +42,11 @@ export function buildSynthesizerMessage(state: any): string {
     .map((note: any) => `\n[${note.tool}] ${note.query}\n${note.result}`)
     .join("\n---\n");
 
-  return `Company: ${state.companyName}\n\nResearch notes:${notes}`;
+  const currentDate = new Date().toISOString().split("T")[0];
+  const currentYear = new Date().getFullYear();
+
+  return `Current Date: ${currentDate} (Year: ${currentYear})
+Company: ${state.companyName}
+
+Research notes:${notes}`;
 }

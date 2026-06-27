@@ -24,12 +24,16 @@ export function buildResearcherMessage(state: any): string {
     .map((note: any) => `[${note.tool}] ${note.query}: ${note.result.substring(0, 260)}`)
     .join("\n\n");
 
-  return `Company: ${state.companyName}
+  const currentDate = new Date().toISOString().split("T")[0];
+  const currentYear = new Date().getFullYear();
+
+  return `Current Date: ${currentDate} (Year: ${currentYear})
+Company: ${state.companyName}
 Ticker: ${state.ticker ?? "unknown"}
 Iteration: ${state.iterationCount}/${state.maxIterations}
 Tools used: ${state.toolsUsed.join(", ") || "none"}
 Research so far:
 ${notes || "No research yet."}
 
-Choose the next best tool call or mark researchComplete = true if the evidence is sufficient.`;
+Choose the next best tool call or mark researchComplete = true if the evidence is sufficient. Use the current date and year (${currentYear}) for news queries to retrieve search results for the current year.`;
 }

@@ -4,83 +4,87 @@
 
 :root {
   color-scheme: dark;
-  --bg-base:       #0A0B0E;   /* near-black, not pure black */
-  --bg-surface:    #111318;   /* card surface */
-  --bg-elevated:   #1A1D24;   /* elevated panels */
-  --border:        #242830;   /* default border */
-  --border-bright: #343A47;   /* hovered/active border */
+  --bg-base:       #0A0C10;   /* clean deep charcoal background */
+  --bg-surface:    #12141C;   /* card surface */
+  --bg-surface-glass: rgba(18, 20, 28, 0.7);
+  --bg-elevated:   #1C1E26;   /* elevated panels */
+  --bg-elevated-glass: rgba(28, 30, 38, 0.5);
+  --border:        #222630;   /* default border */
+  --border-bright: #2B59FF;   /* Electric Blue active border */
   
-  --text-primary:  #E8EAF0;   /* primary text */
-  --text-secondary:#8B9099;   /* labels, metadata */
-  --text-muted:    #555C69;   /* placeholders, disabled */
+  --text-primary:  #F3F4F6;   /* primary text */
+  --text-secondary:#9CA3AF;   /* labels, metadata */
+  --text-muted:    #6B7280;   /* placeholders, disabled */
 
-  --accent:        #00C896;   /* primary action — terminal green */
-  --accent-dim:    #00C89620; /* accent backgrounds */
-  --up:            #00D084;   /* price up */
-  --down:          #FF4D6D;   /* price down */
-  --warn:          #F5A623;   /* hold/neutral */
+  --accent:        #2B59FF;   /* Electric Blue accent */
+  --accent-dim:    rgba(43, 89, 255, 0.12); /* dim accent backgrounds */
+  --up:            #10B981;   /* price up */
+  --down:          #EF4444;   /* price down */
+  --warn:          #FF5C00;   /* Vivid Orange warn/hold */
 
   /* recommendation colors */
   --rec-strong-buy-bg:     rgba(16, 185, 129, 0.1);
   --rec-strong-buy-text:   #34d399;
   --rec-strong-buy-border: rgba(16, 185, 129, 0.3);
   
-  --rec-buy-bg:            rgba(14, 165, 233, 0.1);
-  --rec-buy-text:          #38bdf8;
-  --rec-buy-border:        rgba(14, 165, 233, 0.3);
+  --rec-buy-bg:            rgba(43, 89, 255, 0.1);
+  --rec-buy-text:          #3B82F6;
+  --rec-buy-border:        rgba(43, 89, 255, 0.3);
   
-  --rec-hold-bg:           rgba(245, 166, 35, 0.1);
-  --rec-hold-text:         #F5A623;
-  --rec-hold-border:       rgba(245, 166, 35, 0.3);
+  --rec-hold-bg:           rgba(255, 92, 0, 0.12);
+  --rec-hold-text:         #FF5C00;
+  --rec-hold-border:       rgba(255, 92, 0, 0.3);
   
   --rec-pass-bg:           rgba(249, 115, 22, 0.1);
   --rec-pass-text:         #fb923c;
   --rec-pass-border:       rgba(249, 115, 22, 0.3);
   
-  --rec-avoid-bg:          rgba(255, 77, 109, 0.1);
-  --rec-avoid-text:        #FF4D6D;
-  --rec-avoid-border:      rgba(255, 77, 109, 0.3);
+  --rec-avoid-bg:          rgba(239, 68, 68, 0.1);
+  --rec-avoid-text:        #EF4444;
+  --rec-avoid-border:      rgba(239, 68, 68, 0.3);
 }
 
 :root[data-theme='light'],
 html.light {
   color-scheme: light;
-  --bg-base:       #E2E5E9;   /* softer light gray background for lower glare and better card contrast */
-  --bg-surface:    #FFFFFF;   /* pure white card surface */
-  --bg-elevated:   #D2D6DC;   /* elevated panels */
-  --border:        #C3C8D0;   /* darker border color for clearer separation in light mode */
-  --border-bright: #8E95A2;   /* hovered/active border */
+  --bg-base:       #F9F9F9;   /* Pure off-white background */
+  --bg-surface:    #FFFFFF;   /* Pure white card surface */
+  --bg-surface-glass: rgba(255, 255, 255, 0.75);
+  --bg-elevated:   #F3F4F6;   /* elevated panels */
+  --bg-elevated-glass: rgba(243, 244, 246, 0.5);
+  --border:        #E5E7EB;   /* subtle light border */
+  --border-bright: #2B59FF;   /* Electric Blue active border */
   
-  --text-primary:  #0C0E12;   /* high contrast near-black text */
-  --text-secondary:#2E333D;   /* much darker gray for metadata readability */
-  --text-muted:    #555D6C;   /* dark slate-gray for muted details */
+  --text-primary:  #1A1A1A;   /* Deep Charcoal text */
+  --text-secondary:#4B5563;   /* metadata charcoal */
+  --text-muted:    #9CA3AF;   /* placeholder */
 
-  --accent:        #007A5A;   /* deeper green accent for link readability */
-  --accent-dim:    #007A5A15; /* accent backgrounds */
-  --up:            #007A48;   /* price up */
-  --down:          #C21E3E;   /* price down */
-  --warn:          #B45309;   /* hold/neutral */
+  --accent:        #2B59FF;   /* Electric Blue accent */
+  --accent-dim:    rgba(43, 89, 255, 0.08);
+  --up:            #10B981;   /* price up */
+  --down:          #EF4444;   /* price down */
+  --warn:          #FF5C00;   /* Vivid Orange warn/hold */
 
   /* recommendation colors for light theme */
-  --rec-strong-buy-bg:     rgba(0, 122, 72, 0.1);
-  --rec-strong-buy-text:   #006B3E;
-  --rec-strong-buy-border: rgba(0, 122, 72, 0.25);
+  --rec-strong-buy-bg:     rgba(16, 185, 129, 0.08);
+  --rec-strong-buy-text:   #059669;
+  --rec-strong-buy-border: rgba(16, 185, 129, 0.2);
   
-  --rec-buy-bg:            rgba(3, 105, 161, 0.1);
-  --rec-buy-text:          #02699C;
-  --rec-buy-border:        rgba(3, 105, 161, 0.25);
+  --rec-buy-bg:            rgba(43, 89, 255, 0.08);
+  --rec-buy-text:          #2563EB;
+  --rec-buy-border:        rgba(43, 89, 255, 0.2);
   
-  --rec-hold-bg:           rgba(180, 83, 9, 0.1);
-  --rec-hold-text:         #92400E;
-  --rec-hold-border:       rgba(180, 83, 9, 0.25);
+  --rec-hold-bg:           rgba(255, 92, 0, 0.08);
+  --rec-hold-text:         #D94E00;
+  --rec-hold-border:       rgba(255, 92, 0, 0.2);
   
-  --rec-pass-bg:           rgba(194, 65, 12, 0.1);
-  --rec-pass-text:         #9A3412;
-  --rec-pass-border:       rgba(194, 65, 12, 0.25);
+  --rec-pass-bg:           rgba(249, 115, 22, 0.08);
+  --rec-pass-text:         #EA580C;
+  --rec-pass-border:       rgba(249, 115, 22, 0.2);
   
-  --rec-avoid-bg:          rgba(190, 18, 60, 0.1);
-  --rec-avoid-text:        #9F1239;
-  --rec-avoid-border:      rgba(190, 18, 60, 0.25);
+  --rec-avoid-bg:          rgba(239, 68, 68, 0.08);
+  --rec-avoid-text:        #DC2626;
+  --rec-avoid-border:      rgba(239, 68, 68, 0.2);
 }
 
 html {
@@ -99,13 +103,34 @@ body {
 }
 
 .panel {
-  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 8px;
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .panel:hover {
   border-color: var(--border-bright);
+}
+
+/* Glassmorphism background overrides for panels */
+.panel.bg-bg-surface,
+.panel.bg-bg-elevated,
+.panel:not([class*="bg-"]) {
+  background: var(--bg-surface-glass) !important;
+}
+
+.panel.bg-bg-elevated\/20,
+.panel.bg-bg-elevated\/10,
+.panel.bg-bg-elevated\/95 {
+  background: var(--bg-elevated-glass) !important;
+}
+
+.glass-header {
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
 }
 
 ::-webkit-scrollbar {

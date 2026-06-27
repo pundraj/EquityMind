@@ -23,12 +23,12 @@ const workflow = new StateGraph(AgentState)
 export const investmentAgent = workflow.compile();
 
 export async function runAgent(companyName: string, onLog?: (message: string) => void) {
-  const initialState = {
+  const initialState: AgentStateType = {
     companyName,
     ticker: null,
     researchNotes: [],
     toolsUsed: [],
-    agentLog: [`🚀 Starting research on ${companyName}...`],
+    agentLog: [`[START] Initiating equity research for ${companyName}`],
     iterationCount: 0,
     maxIterations: 5,
     researchComplete: false,
@@ -38,19 +38,36 @@ export async function runAgent(companyName: string, onLog?: (message: string) =>
 
   onLog?.(initialState.agentLog[0]);
 
-  const result = await investmentAgent.invoke(initialState, {
-    callbacks: [
-      {
-        handleLLMNewToken(token) {
-          if (token && token.trim()) onLog?.(token);
-        },
-      },
-    ],
-  });
+  let finalState = { ...initialState };
 
-  for (const entry of result.agentLog ?? []) {
-    onLog?.(entry);
+  try {
+    const stream = await investmentAgent.stream(initialState);
+    for await (const chunk of stream) {
+      const nodeName = Object.keys(chunk)[0];
+      const nodeOutput = chunk[nodeName];
+      if (nodeOutput) {
+        finalState = {
+          ...finalState,
+          ...nodeOutput,
+          researchNotes: nodeOutput.researchNotes ? [...finalState.researchNotes, ...nodeOutput.researchNotes] : finalState.researchNotes,
+          toolsUsed: nodeOutput.toolsUsed ? [...new Set([...finalState.toolsUsed, ...nodeOutput.toolsUsed])] : finalState.toolsUsed,
+          agentLog: nodeOutput.agentLog ? [...finalState.agentLog, ...nodeOutput.agentLog] : finalState.agentLog,
+        };
+
+        if (nodeOutput.agentLog && Array.isArray(nodeOutput.agentLog)) {
+          for (const logLine of nodeOutput.agentLog) {
+            onLog?.(logLine);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const errorLog = `[ERROR] Agent execution failed: ${message}`;
+    onLog?.(errorLog);
+    finalState.error = message;
+    finalState.agentLog = [...finalState.agentLog, errorLog];
   }
 
-  return result;
+  return finalState;
 }

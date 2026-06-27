@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const tickers = searchParams.get("tickers");
+  const startTime = Date.now();
+  const { searchParams } = new URL(req.url);
+  const tickers = searchParams.get("tickers");
+  console.log(`[API REQUEST] GET /api/quotes - Tickers: ${tickers}`);
 
+  try {
     if (!tickers) {
+      console.warn(`[API WARN] GET /api/quotes - Missing tickers param`);
       return NextResponse.json({ error: "Tickers parameter is required" }, { status: 400 });
     }
 
@@ -43,9 +46,12 @@ export async function GET(req: NextRequest) {
       };
     }
 
+    console.log(`[API SUCCESS] GET /api/quotes - Fetched spark data for ${Object.keys(quotes).length} symbols in ${Date.now() - startTime}ms`);
+
     return NextResponse.json({ quotes });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error";
+    console.error(`[API ERROR] GET /api/quotes - Failed: ${msg}`);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
