@@ -2,25 +2,55 @@
 
 import { useEffect, useRef } from "react";
 
-export default function AgentTrace({ logs, isLoading }: { logs: string[]; isLoading: boolean }) {
+interface AgentTraceProps {
+  logs: string[];
+  isLoading: boolean;
+}
+
+export default function AgentTrace({ logs, isLoading }: AgentTraceProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [logs]);
+  }, [logs, isLoading]);
+
+  const getLineColor = (log: string) => {
+    if (log.includes("✅") || log.toLowerCase().includes("complete") || log.toLowerCase().includes("verdict generated")) {
+      return "text-up";
+    }
+    if (log.includes("❌") || log.toLowerCase().includes("failed") || log.toLowerCase().includes("error")) {
+      return "text-down";
+    }
+    if (log.includes("🔍") || log.toLowerCase().includes("starting")) {
+      return "text-warn";
+    }
+    return "text-text-primary";
+  };
 
   return (
-    <div className="rounded-[24px] border border-white/10 bg-slate-950/70 p-5 shadow-glow backdrop-blur-xl">
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Agent Trace</p>
-        {isLoading && <span className="text-xs text-cyan-300">thinking...</span>}
+    <div className="panel p-5 bg-bg-surface border-border-default/80">
+      <div className="mb-4 flex items-center justify-between border-b border-border-default/50 pb-2">
+        <p className="text-xs font-mono font-bold uppercase tracking-wider text-text-secondary">
+          &gt;_ AGENT_RESEARCH_TRACE.LOG
+        </p>
+        {isLoading && (
+          <span className="text-xs font-mono text-accent animate-pulse">
+            [RUNNING_AGENT]
+          </span>
+        )}
       </div>
-      <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+
+      <div className="max-h-72 space-y-1.5 overflow-y-auto pr-1 font-mono text-sm leading-relaxed scrollbar">
         {logs.map((log, index) => (
-          <p key={index} className="rounded-xl border border-white/5 bg-white/5 px-3 py-2 font-mono text-sm text-emerald-300">
-            {log}
+          <p key={index} className={getLineColor(log)}>
+            &gt; {log}
           </p>
         ))}
+        {isLoading && (
+          <p className="text-accent">
+            &gt; <span className="animate-pulse font-black">_</span>
+          </p>
+        )}
         <div ref={bottomRef} />
       </div>
     </div>

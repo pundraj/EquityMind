@@ -24,6 +24,22 @@ export const VerdictSchema = z.object({
   keyMetrics: z.array(z.string()),
   reasoning: z.string(),
   dataFreshness: z.string(),
+  decisionBreakdown: z.object({
+    financialHealthReasoning: z.string(),
+    valuationReasoning: z.string(),
+    marketPositionReasoning: z.string(),
+    newsSentimentReasoning: z.string(),
+    growthSignalsReasoning: z.string(),
+  }),
+  catalysts: z.array(z.string()).min(1).max(5),
+  risks: z.array(z.string()).min(1).max(5),
+  timeHorizon: z.enum(["SHORT_TERM", "MEDIUM_TERM", "LONG_TERM"]),
+  targetPriceRange: z.object({
+    low: z.number().nullable(),
+    high: z.number().nullable(),
+    basis: z.string(),
+  }).nullable(),
+  comparablePeers: z.array(z.string()).max(3),
 });
 
 export const AgentState = Annotation.Root({

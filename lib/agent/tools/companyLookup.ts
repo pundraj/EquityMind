@@ -15,7 +15,19 @@ export const companyLookupTool = tool(
       const quote = data?.quotes?.find((item: any) => item.symbol && item.quoteType === "EQUITY");
 
       if (!quote) {
-        return `No public ticker found for ${companyName}.`;
+        const suggestions = data?.quotes
+          ?.filter((item: any) => item.symbol)
+          .map((item: any) => ({
+            ticker: item.symbol,
+            name: item.shortname ?? item.longname ?? item.symbol,
+          }))
+          .slice(0, 5) || [];
+
+        return JSON.stringify({
+          error: "NOT_FOUND",
+          input: companyName,
+          suggestions,
+        });
       }
 
       return JSON.stringify(

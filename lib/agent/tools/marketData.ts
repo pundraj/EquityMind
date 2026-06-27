@@ -17,23 +17,50 @@ async function fetchQuoteSummary(ticker: string) {
   return response.json();
 }
 
+async function fetchFallbackChartData(ticker: string) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1d&includePrePost=false`;
+  const response = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+  if (!response.ok) throw new Error(`Chart fallback failed: ${response.status}`);
+  const json = await response.json();
+  const meta = json?.chart?.result?.[0]?.meta;
+  if (!meta) throw new Error("No chart data in fallback");
+  return {
+    ticker,
+    currentPrice: meta.regularMarketPrice ?? null,
+    fiftyTwoWeekLow: meta.fiftyTwoWeekLow ?? null,
+    fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh ?? null,
+    marketCap: null,
+    peRatio: null,
+    forwardPE: null,
+    priceToSales: null,
+    revenueGrowth: null,
+    profitMargin: null,
+    debtToEquity: null,
+    operatingMargins: null,
+    analystTargetMean: null,
+    beta: null,
+    isFallback: true,
+  };
+}
+
 export const marketDataTool = tool(
   async ({ ticker }) => {
     try {
-      const data = await fetchQuoteSummary(ticker);
-      const summary = data?.quoteSummary?.result?.[0];
+      let dataObj;
+      try {
+        const data = await fetchQuoteSummary(ticker);
+        const summary = data?.quoteSummary?.result?.[0];
 
-      if (!summary) {
-        return `No market data found for ${ticker}.`;
-      }
+        if (!summary) {
+          throw new Error("No summary result found");
+        }
 
-      const price = summary.price ?? {};
-      const summaryDetail = summary.summaryDetail ?? {};
-      const financialData = summary.financialData ?? {};
-      const stats = summary.defaultKeyStatistics ?? {};
+        const price = summary.price ?? {};
+        const summaryDetail = summary.summaryDetail ?? {};
+        const financialData = summary.financialData ?? {};
+        const stats = summary.defaultKeyStatistics ?? {};
 
-      return JSON.stringify(
-        {
+        dataObj = {
           ticker,
           currentPrice: price.regularMarketPrice?.raw ?? null,
           marketCap: price.marketCap?.raw ?? null,
@@ -48,10 +75,20 @@ export const marketDataTool = tool(
           fiftyTwoWeekLow: summaryDetail.fiftyTwoWeekLow?.raw ?? null,
           fiftyTwoWeekHigh: summaryDetail.fiftyTwoWeekHigh?.raw ?? null,
           beta: stats.beta?.raw ?? null,
-        },
-        null,
-        2,
-      );
+          isFallback: false,
+        };
+      } catch (error) {
+        dataObj = await fetchFallbackChartData(ticker);
+      }
+
+      if (dataObj.isFallback) {
+        return JSON.stringify({
+          ...dataObj,
+          _notice: "Note: Fundamental metrics like PE, Profit Margin, Debt-to-Equity are unavailable via Yahoo Finance API due to security restrictions. You MUST run a web_search focusing on 'financials' or 'key metrics' to retrieve the missing metrics (e.g. PE ratio, debt-to-equity, profit margins) for this company."
+        }, null, 2);
+      }
+
+      return JSON.stringify(dataObj, null, 2);
     } catch (error) {
       return `Market data unavailable for ${ticker}: ${error instanceof Error ? error.message : String(error)}`;
     }

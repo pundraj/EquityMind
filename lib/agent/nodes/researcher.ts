@@ -44,6 +44,10 @@ export async function researcherNode(state: AgentStateType): Promise<Partial<Age
     log.push(`ℹ️ ${content.substring(0, 200)}`);
   }
 
+  let updatedTicker = state.ticker;
+  let stateError = state.error;
+  let finalResearchComplete = researchComplete;
+
   for (const call of toolCalls) {
     const toolName = call.name;
     const args = (call.args ?? {}) as Record<string, unknown>;
@@ -56,6 +60,21 @@ export async function researcherNode(state: AgentStateType): Promise<Partial<Age
       result: String(result),
       timestamp: new Date().toISOString(),
     });
+
+    if (toolName === "company_lookup") {
+      try {
+        const parsed = JSON.parse(String(result));
+        if (parsed.ticker) {
+          updatedTicker = parsed.ticker;
+        } else if (parsed.error === "NOT_FOUND") {
+          stateError = String(result);
+          finalResearchComplete = true;
+        }
+      } catch (e) {
+        // Fallback if not JSON
+      }
+    }
+
     toolsUsedThisRound.push(toolName);
     log.push(`✅ ${toolName} complete`);
   }
@@ -65,7 +84,8 @@ export async function researcherNode(state: AgentStateType): Promise<Partial<Age
     toolsUsed: toolsUsedThisRound,
     agentLog: log,
     iterationCount: state.iterationCount + 1,
-    ticker: state.ticker,
-    researchComplete,
+    ticker: updatedTicker,
+    researchComplete: finalResearchComplete,
+    error: stateError,
   };
 }

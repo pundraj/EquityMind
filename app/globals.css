@@ -4,6 +4,83 @@
 
 :root {
   color-scheme: dark;
+  --bg-base:       #0A0B0E;   /* near-black, not pure black */
+  --bg-surface:    #111318;   /* card surface */
+  --bg-elevated:   #1A1D24;   /* elevated panels */
+  --border:        #242830;   /* default border */
+  --border-bright: #343A47;   /* hovered/active border */
+  
+  --text-primary:  #E8EAF0;   /* primary text */
+  --text-secondary:#8B9099;   /* labels, metadata */
+  --text-muted:    #555C69;   /* placeholders, disabled */
+
+  --accent:        #00C896;   /* primary action — terminal green */
+  --accent-dim:    #00C89620; /* accent backgrounds */
+  --up:            #00D084;   /* price up */
+  --down:          #FF4D6D;   /* price down */
+  --warn:          #F5A623;   /* hold/neutral */
+
+  /* recommendation colors */
+  --rec-strong-buy-bg:     rgba(16, 185, 129, 0.1);
+  --rec-strong-buy-text:   #34d399;
+  --rec-strong-buy-border: rgba(16, 185, 129, 0.3);
+  
+  --rec-buy-bg:            rgba(14, 165, 233, 0.1);
+  --rec-buy-text:          #38bdf8;
+  --rec-buy-border:        rgba(14, 165, 233, 0.3);
+  
+  --rec-hold-bg:           rgba(245, 166, 35, 0.1);
+  --rec-hold-text:         #F5A623;
+  --rec-hold-border:       rgba(245, 166, 35, 0.3);
+  
+  --rec-pass-bg:           rgba(249, 115, 22, 0.1);
+  --rec-pass-text:         #fb923c;
+  --rec-pass-border:       rgba(249, 115, 22, 0.3);
+  
+  --rec-avoid-bg:          rgba(255, 77, 109, 0.1);
+  --rec-avoid-text:        #FF4D6D;
+  --rec-avoid-border:      rgba(255, 77, 109, 0.3);
+}
+
+:root[data-theme='light'],
+html.light {
+  color-scheme: light;
+  --bg-base:       #E2E5E9;   /* softer light gray background for lower glare and better card contrast */
+  --bg-surface:    #FFFFFF;   /* pure white card surface */
+  --bg-elevated:   #D2D6DC;   /* elevated panels */
+  --border:        #C3C8D0;   /* darker border color for clearer separation in light mode */
+  --border-bright: #8E95A2;   /* hovered/active border */
+  
+  --text-primary:  #0C0E12;   /* high contrast near-black text */
+  --text-secondary:#2E333D;   /* much darker gray for metadata readability */
+  --text-muted:    #555D6C;   /* dark slate-gray for muted details */
+
+  --accent:        #007A5A;   /* deeper green accent for link readability */
+  --accent-dim:    #007A5A15; /* accent backgrounds */
+  --up:            #007A48;   /* price up */
+  --down:          #C21E3E;   /* price down */
+  --warn:          #B45309;   /* hold/neutral */
+
+  /* recommendation colors for light theme */
+  --rec-strong-buy-bg:     rgba(0, 122, 72, 0.1);
+  --rec-strong-buy-text:   #006B3E;
+  --rec-strong-buy-border: rgba(0, 122, 72, 0.25);
+  
+  --rec-buy-bg:            rgba(3, 105, 161, 0.1);
+  --rec-buy-text:          #02699C;
+  --rec-buy-border:        rgba(3, 105, 161, 0.25);
+  
+  --rec-hold-bg:           rgba(180, 83, 9, 0.1);
+  --rec-hold-text:         #92400E;
+  --rec-hold-border:       rgba(180, 83, 9, 0.25);
+  
+  --rec-pass-bg:           rgba(194, 65, 12, 0.1);
+  --rec-pass-text:         #9A3412;
+  --rec-pass-border:       rgba(194, 65, 12, 0.25);
+  
+  --rec-avoid-bg:          rgba(190, 18, 60, 0.1);
+  --rec-avoid-text:        #9F1239;
+  --rec-avoid-border:      rgba(190, 18, 60, 0.25);
 }
 
 html {
@@ -13,10 +90,38 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: #06111f;
-  color: #e5eef9;
+  background: var(--bg-base);
+  color: var(--text-primary);
 }
 
 * {
   box-sizing: border-box;
+}
+
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.panel:hover {
+  border-color: var(--border-bright);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-bright);
 }

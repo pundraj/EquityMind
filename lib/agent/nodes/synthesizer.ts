@@ -9,6 +9,11 @@ const llm = new ChatGroq({
 });
 
 export async function synthesizerNode(state: AgentStateType): Promise<Partial<AgentStateType>> {
+  if (state.error) {
+    return {
+      error: state.error,
+    };
+  }
   try {
     const response = await llm.invoke([
       { role: "system", content: SYNTHESIZER_SYSTEM_PROMPT },

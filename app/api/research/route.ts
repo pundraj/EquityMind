@@ -22,11 +22,24 @@ export async function POST(req: NextRequest) {
         const result = await runAgent(companyName, (message) => send("log", { message }));
 
         if (result.error) {
-          send("error", { message: result.error });
-        }
-
-        if (result.verdict) {
-          send("verdict", { verdict: result.verdict });
+          try {
+            const parsed = JSON.parse(result.error);
+            if (parsed.error === "NOT_FOUND") {
+              send("suggestions", parsed);
+            } else {
+              send("error", { message: result.error });
+            }
+          } catch {
+            send("error", { message: result.error });
+          }
+        } else if (result.verdict) {
+          send("verdict", { 
+            verdict: {
+              ...result.verdict,
+              ticker: result.ticker,
+              companyName: result.companyName
+            }
+          });
         } else {
           send("error", { message: "No verdict produced" });
         }
