@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { X, RefreshCw, BarChart2 } from "lucide-react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import CompanyLogo from "./CompanyLogo";
+
 
 interface ComparisonTableProps {
   comparedStocks: Array<{
@@ -154,15 +156,18 @@ export default function ComparisonTable({
                 </th>
                 {stocksWithScore.map((stock, idx) => (
                   <th key={stock.ticker} className="p-3.5 relative border-r border-border-default/50 last:border-r-0">
-                    <div className="flex items-center justify-between pr-6 min-w-[150px]">
-                      <div>
-                        <button
-                          onClick={() => onResearch(stock.ticker)}
-                          className="font-bold text-text-primary hover:text-accent transition-colors text-left"
-                        >
-                          {stock.companyName}
-                        </button>
-                        <div className="text-xs text-text-secondary">{stock.ticker}</div>
+                    <div className="flex items-center justify-between pr-6 min-w-[170px]">
+                      <div className="flex items-center gap-2">
+                        <CompanyLogo ticker={stock.ticker} name={stock.companyName} size={28} className="w-7 h-7 flex-shrink-0" />
+                        <div>
+                          <button
+                            onClick={() => onResearch(stock.ticker)}
+                            className="font-bold text-text-primary hover:text-accent transition-colors text-left line-clamp-1"
+                          >
+                            {stock.companyName}
+                          </button>
+                          <div className="text-xs text-text-secondary">{stock.ticker}</div>
+                        </div>
                       </div>
                       <button
                         onClick={() => onRemove(stock.ticker)}

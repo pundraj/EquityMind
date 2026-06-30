@@ -30,7 +30,7 @@ export async function runAgent(companyName: string, onLog?: (message: string) =>
     toolsUsed: [],
     agentLog: [`[START] Initiating equity research for ${companyName}`],
     iterationCount: 0,
-    maxIterations: 5,
+    maxIterations: Number(process.env.AGENT_MAX_ITERATIONS) || 3,
     researchComplete: false,
     verdict: null,
     error: null,

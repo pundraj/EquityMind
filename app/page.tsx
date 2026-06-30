@@ -8,6 +8,8 @@ import VerdictCard from "@/components/VerdictCard";
 import WatchlistPanel from "@/components/WatchlistPanel";
 import SuggestionBanner from "@/components/SuggestionBanner";
 import ComparisonTable from "@/components/ComparisonTable";
+import IntelligencePanel from "@/components/IntelligencePanel";
+import DocumentationPanel from "@/components/DocumentationPanel";
 import { Layers, Sun, Moon } from "lucide-react";
 
 // Dynamic import for StockChart to avoid Next.js SSR hydration errors
@@ -40,6 +42,7 @@ export default function Home() {
   const [comparedStocks, setComparedStocks] = useState<ComparedStock[]>([]);
   const [theme, setTheme] = useState<"dark" | "light">("light");
   const [showLogs, setShowLogs] = useState(false);
+  const [activeView, setActiveView] = useState<"terminal" | "intelligence" | "documentation">("terminal");
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
@@ -66,6 +69,7 @@ export default function Home() {
   };
 
   const handleResearch = async (companyName: string) => {
+    setActiveView("terminal");
     setInputValue(companyName);
     setSuggestions([]);
     setLogs([]);
@@ -190,6 +194,7 @@ export default function Home() {
             {/* Small Hexagon Logo Mark */}
             <button 
               onClick={() => {
+                setActiveView("terminal");
                 setVerdict(null);
                 setLogs([]);
                 setIsLoading(false);
@@ -210,51 +215,74 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Center Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-[10px] font-mono text-text-primary uppercase font-bold">
-            <button 
-              onClick={() => {
-                setVerdict(null);
-                setLogs([]);
-                setIsLoading(false);
-                setError(null);
-                setInputValue("");
-              }}
-              className="hover:text-accent transition-colors cursor-pointer"
-            >
-              Terminal
-            </button>
-            <span className="text-border-default/40">|</span>
-            <span className="text-text-secondary cursor-not-allowed">Intelligence</span>
-            <span className="text-border-default/40">|</span>
-            <span className="text-text-secondary cursor-not-allowed">Documentation</span>
-            <span className="text-border-default/40">|</span>
-            <span className="text-text-secondary cursor-not-allowed">API Docs</span>
-          </nav>
+          <div className="flex items-center gap-6">
+            {/* Center Navigation Links shifted to the right */}
+            <nav className="hidden lg:flex items-center gap-6 text-[10px] font-mono text-text-primary uppercase font-bold">
+              <button 
+                onClick={() => {
+                  setActiveView("terminal");
+                  if (activeView === "terminal") {
+                    setVerdict(null);
+                    setLogs([]);
+                    setIsLoading(false);
+                    setError(null);
+                    setInputValue("");
+                  }
+                }}
+                className={`hover:text-accent transition-colors cursor-pointer ${activeView === "terminal" ? "text-accent" : "text-text-secondary"}`}
+              >
+                Terminal
+              </button>
+              <span className="text-border-default/40">|</span>
+              <button 
+                onClick={() => {
+                  setActiveView("intelligence");
+                }}
+                className={`hover:text-accent transition-colors cursor-pointer ${activeView === "intelligence" ? "text-accent" : "text-text-secondary"}`}
+              >
+                Intelligence
+              </button>
+              <span className="text-border-default/40">|</span>
+              <button 
+                onClick={() => {
+                  setActiveView("documentation");
+                }}
+                className={`hover:text-accent transition-colors cursor-pointer ${activeView === "documentation" ? "text-accent" : "text-text-secondary"}`}
+              >
+                Documentation
+              </button>
+            </nav>
 
-          <div className="flex items-center gap-3">
-            {comparedStocks.length > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold bg-accent-dim text-accent rounded-full border border-accent/20 animate-pulse">
-                <Layers size={12} />
-                COMPARING {comparedStocks.length}/4 STOCKS
-              </span>
-            )}
-            
-            <button
-              onClick={toggleTheme}
-              className="w-8 h-8 rounded-full border border-border-default bg-bg-surface hover:border-accent hover:text-accent text-text-secondary transition-colors cursor-pointer flex items-center justify-center"
-              aria-label="Toggle Theme"
-              title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
-            >
-              {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
-            </button>
+            <span className="hidden lg:inline text-border-default/40 font-mono text-[10px]">|</span>
+
+            <div className="flex items-center gap-3">
+              {comparedStocks.length > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold bg-accent-dim text-accent rounded-full border border-accent/20 animate-pulse">
+                  <Layers size={12} />
+                  COMPARING {comparedStocks.length}/4 STOCKS
+                </span>
+              )}
+              
+              <button
+                onClick={toggleTheme}
+                className="w-8 h-8 rounded-full border border-border-default bg-bg-surface hover:border-accent hover:text-accent text-text-secondary transition-colors cursor-pointer flex items-center justify-center"
+                aria-label="Toggle Theme"
+                title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+              >
+                {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+              </button>
+            </div>
           </div>
         </header>
       </div>
 
       {/* Main Content Layout */}
       <main className="flex-1 mx-auto max-w-7xl w-full px-4 py-6 sm:px-6 z-10 relative flex flex-col gap-6">
-        {!(isLoading || verdict || logs.length > 0) ? (
+        {activeView === "intelligence" ? (
+          <IntelligencePanel onResearch={handleResearch} />
+        ) : activeView === "documentation" ? (
+          <DocumentationPanel initialTab="guide" onResearch={handleResearch} />
+        ) : !(isLoading || verdict || logs.length > 0) ? (
           /* LANDING PAGE LAYOUT */
           <div className="flex flex-col gap-10 py-10 animate-fade-in w-full">
             {/* Landing Hero Section */}

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { TOP_10_ACTIVE, TOP_10_LONG_TERM, WatchItem } from "@/lib/data/watchlist";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import CompanyLogo from "./CompanyLogo";
+
 
 interface WatchlistPanelProps {
   onResearch: (ticker: string) => void;
@@ -80,9 +82,10 @@ export default function WatchlistPanel({ onResearch }: WatchlistPanelProps) {
                   className="w-full text-left flex items-center justify-between p-3.5 hover:bg-bg-elevated/40 transition-colors group cursor-pointer"
                 >
                   <div className="flex items-center gap-3 overflow-hidden min-w-0">
-                    <span className="text-text-muted text-xs font-bold w-4">
+                    <span className="text-text-muted text-xs font-bold w-4 flex-shrink-0">
                       {(index + 1).toString().padStart(2, "0")}
                     </span>
+                    <CompanyLogo ticker={item.ticker} name={item.name} size={24} className="w-6 h-6 flex-shrink-0" />
                     <div className="overflow-hidden min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-text-primary group-hover:text-accent transition-colors">

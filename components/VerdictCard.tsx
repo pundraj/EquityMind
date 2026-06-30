@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { TrendingUp, Award, Clock, Plus, Check, ShieldAlert, Sparkles, AlertTriangle, ArrowUpRight, X } from "lucide-react";
 import ComparisonTable from "./ComparisonTable";
+import CompanyLogo from "./CompanyLogo";
+
 
 interface VerdictCardProps {
   verdict: any;
@@ -114,7 +116,8 @@ export default function VerdictCard({
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs text-text-secondary font-mono">VERDICT REPORT</span>
-                <span className="px-2 py-0.5 text-[10px] font-mono bg-bg-elevated text-text-primary rounded border border-border-bright">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-mono bg-bg-elevated text-text-primary rounded border border-border-bright">
+                  <CompanyLogo ticker={verdict.ticker} name={verdict.companyName} size={14} className="w-3.5 h-3.5" />
                   {verdict.ticker || "EQUITY"}
                 </span>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono bg-bg-elevated text-text-primary rounded border border-border-bright">
